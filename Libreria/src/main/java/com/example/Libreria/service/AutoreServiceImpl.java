@@ -35,12 +35,13 @@ public class AutoreServiceImpl implements AutoreService {
 		List<Libro> libri = new ArrayList<Libro>();
 		List<String> libriTitolo = new ArrayList<String>();
 		Autore a ;
-		for (Long id: ids) {
-			Libro l = libroRepository.findById(id).get();
-			libri.add(l);
-			libriTitolo.add(l.getTitolo());
-			
-		}
+		if(ids!=null) {
+			for (Long id: ids) {
+				Libro l = libroRepository.findById(id).get();
+				libri.add(l);
+				libriTitolo.add(l.getTitolo());
+				
+			}}
 		
 			a=new Autore(nome,cognome,libri);
 		
@@ -139,7 +140,7 @@ public class AutoreServiceImpl implements AutoreService {
 		
 	}
 
-	@Override
+	/*@Override
 	public AutoreDTO saveAutoreWithoutBook(String nome, String cognome) {
 		// TODO Auto-generated method stub
 			Autore a ;
@@ -149,7 +150,7 @@ public class AutoreServiceImpl implements AutoreService {
 		autoreRepository.save(a);
 		AutoreDTO aDTO=new AutoreDTO(a.getId(),a.getNome(),a.getCognome());
 		return aDTO;
-	}
+	}*/
 
 	
 	

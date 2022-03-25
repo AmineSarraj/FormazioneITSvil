@@ -15,7 +15,7 @@ import com.example.Libreria.entity.Ubicazione;
 
 public interface AutoreService {
 	AutoreDTO saveAutore(String nome,String cognome,List<Long> ids);
-	AutoreDTO saveAutoreWithoutBook(String nome,String cognome);
+	//AutoreDTO saveAutoreWithoutBook(String nome,String cognome);
 	AutoreDTO updateAutore(String nome,String cognome,Long id);
 	AutoreDTO getByIdAutore(Long id);
 	AutoreDTO getByNomeAutore(String name);

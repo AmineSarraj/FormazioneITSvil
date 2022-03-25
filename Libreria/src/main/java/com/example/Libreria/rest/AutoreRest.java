@@ -61,35 +61,35 @@ public class AutoreRest {
 	@Bulkhead(name="insertAutore", fallbackMethod = "fallbackInsertAutore",type = Bulkhead.Type.THREADPOOL)
 	@PutMapping(value ="/1.0/insertAutore", produces =MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody   CompletableFuture<ResponseEntity<RisultatoDTO<AutoreDTO>>> insertAutore(  @RequestBody InsertAutoreWithoutLibriDTO inputAutoreDTO) {
-		if (inputAutoreDTO.getCognome()==null ||StringUtils.isBlank( inputAutoreDTO.getCognome()) ) {
-			RisultatoDTO<AutoreDTO>  risultatoAutore=new RisultatoDTO<>();
+		RisultatoDTO<AutoreDTO>  risultatoAutore=new RisultatoDTO<>();
+		if (inputAutoreDTO.getCognome()==null ||StringUtils.isBlank( inputAutoreDTO.getCognome())||inputAutoreDTO.getNome()==null || StringUtils.isBlank( inputAutoreDTO.getNome()) ) {
+			
 			risultatoAutore.setData(null);
 			risultatoAutore.setSuccess(true);
-			risultatoAutore.setDescrizione("cognome non deve essere null");
-			risultatoAutore.setCode(200);
+			risultatoAutore.setDescrizione("Impossibile di inserire un nuovo autore");
+			risultatoAutore.setCode(404);
 		return CompletableFuture.completedFuture( new ResponseEntity<RisultatoDTO<AutoreDTO>>(
 				risultatoAutore, 
-		          HttpStatus.OK));}
-		else if (inputAutoreDTO.getNome()==null || StringUtils.isBlank( inputAutoreDTO.getNome())) 
+		          HttpStatus.BAD_REQUEST));}
+		/*else if (inputAutoreDTO.getNome()==null || StringUtils.isBlank( inputAutoreDTO.getNome())) 
 			{
-				RisultatoDTO<AutoreDTO>  risultatoAutore=new RisultatoDTO<>();
+				
 				risultatoAutore.setData(null);
 				risultatoAutore.setSuccess(true);
 				risultatoAutore.setDescrizione("nome non deve essere null");
 				risultatoAutore.setCode(200);
 			return CompletableFuture.completedFuture(new ResponseEntity<RisultatoDTO<AutoreDTO>>(
 					risultatoAutore, 
-			          HttpStatus.OK));}
+			          HttpStatus.OK));}*/
 		
 		else {
 		
 		AutoreDTO result ;
-		RisultatoDTO<AutoreDTO>  risultatoAutore=new RisultatoDTO<>();
 		
-		if(inputAutoreDTO.getLibriIds()!=null)
-			result= autoreService.saveAutore(inputAutoreDTO.getNome(), inputAutoreDTO.getCognome(), inputAutoreDTO.getLibriIds());
-		else 
-			result= autoreService.saveAutoreWithoutBook(inputAutoreDTO.getNome(), inputAutoreDTO.getCognome());	
+		
+		
+		result= autoreService.saveAutore(inputAutoreDTO.getNome(), inputAutoreDTO.getCognome(), inputAutoreDTO.getLibriIds());
+			
 		risultatoAutore.setData(result);
 		risultatoAutore.setSuccess(true);
 		risultatoAutore.setDescrizione("autore aggiunto con successo");
