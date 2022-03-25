@@ -6,7 +6,7 @@ import java.util.concurrent.CompletableFuture;
 
 import javax.validation.Valid;
 import org.springframework.http.MediaType;
-
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
@@ -56,12 +56,12 @@ public class AutoreRest {
 	*@return result chi un DTO di autore che lo restituisce come risultato dell'autore aggiunto
 	*/
 	
-	@CircuitBreaker(name="AutoreInserService",fallbackMethod = "fallbackInsertAutore")
-	@TimeLimiter(name = "AutoreInserService", fallbackMethod = "fallbackInsertAutore")
-	@Bulkhead(name="AutoreInserService", fallbackMethod = "fallbackInsertAutore",type = Bulkhead.Type.THREADPOOL)
+	@CircuitBreaker(name="insertAutore",fallbackMethod = "fallbackInsertAutore")
+	@TimeLimiter(name = "insertAutore", fallbackMethod = "fallbackInsertAutore")
+	@Bulkhead(name="insertAutore", fallbackMethod = "fallbackInsertAutore",type = Bulkhead.Type.THREADPOOL)
 	@PutMapping(value ="/1.0/insertAutore", produces =MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody   CompletableFuture<ResponseEntity<RisultatoDTO<AutoreDTO>>> insertAutore(  @RequestBody InsertAutoreWithoutLibriDTO inputAutoreDTO) {
-		if (inputAutoreDTO.getCognome()==null || inputAutoreDTO.getCognome()=="" ) {
+		if (inputAutoreDTO.getCognome()==null ||StringUtils.isBlank( inputAutoreDTO.getCognome()) ) {
 			RisultatoDTO<AutoreDTO>  risultatoAutore=new RisultatoDTO<>();
 			risultatoAutore.setData(null);
 			risultatoAutore.setSuccess(true);
@@ -70,7 +70,7 @@ public class AutoreRest {
 		return CompletableFuture.completedFuture( new ResponseEntity<RisultatoDTO<AutoreDTO>>(
 				risultatoAutore, 
 		          HttpStatus.OK));}
-		else if (inputAutoreDTO.getNome()==null || inputAutoreDTO.getNome()=="") 
+		else if (inputAutoreDTO.getNome()==null || StringUtils.isBlank( inputAutoreDTO.getNome())) 
 			{
 				RisultatoDTO<AutoreDTO>  risultatoAutore=new RisultatoDTO<>();
 				risultatoAutore.setData(null);
@@ -119,12 +119,12 @@ public class AutoreRest {
 	*@return result chi un DTO di autore che lo restituisce come risultato dell'autore modificato
 	*/
 	
-	@CircuitBreaker(name="UpdateAutoreService",fallbackMethod = "fallbackUpdateAutore")
-	@TimeLimiter(name = "UpdateAutoreService", fallbackMethod = "fallbackUpdateAutore")
-	@Bulkhead(name="UpdateAutoreService", fallbackMethod = "fallbackUpdateAutore",type = Bulkhead.Type.SEMAPHORE)
+	@CircuitBreaker(name="updateAutore",fallbackMethod = "fallbackUpdateAutore")
+	@TimeLimiter(name = "updateAutore", fallbackMethod = "fallbackUpdateAutore")
+	@Bulkhead(name="updateAutore", fallbackMethod = "fallbackUpdateAutore",type = Bulkhead.Type.SEMAPHORE)
 	@PostMapping(value ="/1.0/updateAutore", produces =MediaType.APPLICATION_JSON_VALUE)
     public  CompletableFuture<ResponseEntity<RisultatoDTO<AutoreDTO>>> updateAutore(@RequestBody UpdateAuthorDTOInput inputAutoreDTO) {
-		if (inputAutoreDTO.getCognome()==null || inputAutoreDTO.getCognome()=="" ) {
+		if (inputAutoreDTO.getCognome()==null || StringUtils.isBlank( inputAutoreDTO.getCognome()) ) {
 			RisultatoDTO<AutoreDTO>  risultatoAutore=new RisultatoDTO<>();
 			risultatoAutore.setData(null);
 			risultatoAutore.setSuccess(true);
@@ -133,7 +133,7 @@ public class AutoreRest {
 		return CompletableFuture.completedFuture(new ResponseEntity<RisultatoDTO<AutoreDTO>>(
 				risultatoAutore, 
 		          HttpStatus.OK));}
-		else if (inputAutoreDTO.getNome()==null || inputAutoreDTO.getNome()=="") 
+		else if (inputAutoreDTO.getNome()==null || StringUtils.isBlank( inputAutoreDTO.getNome())) 
 			{
 				RisultatoDTO<AutoreDTO>  risultatoAutore=new RisultatoDTO<>();
 				risultatoAutore.setData(null);

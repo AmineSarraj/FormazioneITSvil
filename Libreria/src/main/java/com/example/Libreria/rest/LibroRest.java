@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.sql.Date;
+import org.apache.commons.lang3.StringUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -120,9 +121,9 @@ public class LibroRest {
 		List<String> obblParameters=new ArrayList<>();
 		//Boolean success=true;
 		
-		if(libroDTO.getTitolo()==null||libroDTO.getTitolo().isBlank()) { obblParameters.add("Titolo");}
-		if(libroDTO.getCasaEditrice()==null||libroDTO.getCasaEditrice().isBlank()) { obblParameters.add("CasaEditrice");}
-		if(libroDTO.getTrama()==null||libroDTO.getTrama().isBlank()) { obblParameters.add("Trama");}
+		if(libroDTO.getTitolo()==null||StringUtils.isBlank(libroDTO.getTitolo())) { obblParameters.add("Titolo");}
+		if(libroDTO.getCasaEditrice()==null||StringUtils.isBlank(libroDTO.getCasaEditrice())) { obblParameters.add("CasaEditrice");}
+		if(libroDTO.getTrama()==null||StringUtils.isBlank(libroDTO.getCasaEditrice())) { obblParameters.add("Trama");}
 		if(!obblParameters.isEmpty()) {
 		RisultatoDTO<LibroDTO> risultatoLibro=new RisultatoDTO<>();
 		StringBuilder NullorEmptyOutputAttributs= new StringBuilder();

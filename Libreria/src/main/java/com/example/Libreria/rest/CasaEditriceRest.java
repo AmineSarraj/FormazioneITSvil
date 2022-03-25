@@ -2,6 +2,7 @@ package com.example.Libreria.rest;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -53,7 +54,7 @@ public class CasaEditriceRest {
 		CasaEditriceDTO casa_editriceDTO;
 		
 		
-		if (casa_EditriceDTO.getNome()==null || casa_EditriceDTO.getNome()=="" ) {
+		if (casa_EditriceDTO.getNome()==null || StringUtils.isBlank(casa_EditriceDTO.getNome())) {
 			RisultatoDTO<CasaEditriceDTO>  risultatoCasaEditrice=new RisultatoDTO<>();
 			risultatoCasaEditrice.setData(null);
 			risultatoCasaEditrice.setSuccess(true);
@@ -219,7 +220,7 @@ public class CasaEditriceRest {
 		
         
         
-		 if (casa_EditriceDTO.getNome()==null || casa_EditriceDTO.getNome()=="") 
+		 if (casa_EditriceDTO.getNome()==null || StringUtils.isBlank(casa_EditriceDTO.getNome())) 
 			{
 			 RisultatoDTO<CasaEditriceDTO> risultatoCasaEditrice=new RisultatoDTO<>();
 				risultatoCasaEditrice.setData(null);
