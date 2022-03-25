@@ -60,7 +60,7 @@ public class AutoreRest {
 	@TimeLimiter(name = "AutoreInserService", fallbackMethod = "fallbackInsertAutore")
 	@Bulkhead(name="AutoreInserService", fallbackMethod = "fallbackInsertAutore",type = Bulkhead.Type.THREADPOOL)
 	@PutMapping(value ="/1.0/insertAutore", produces =MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody   CompletableFuture<ResponseEntity<RisultatoDTO<AutoreDTO>>> SaveAutore(  @RequestBody InsertAutoreWithoutLibriDTO inputAutoreDTO) {
+    public @ResponseBody   CompletableFuture<ResponseEntity<RisultatoDTO<AutoreDTO>>> insertAutore(  @RequestBody InsertAutoreWithoutLibriDTO inputAutoreDTO) {
 		if (inputAutoreDTO.getCognome()==null || inputAutoreDTO.getCognome()=="" ) {
 			RisultatoDTO<AutoreDTO>  risultatoAutore=new RisultatoDTO<>();
 			risultatoAutore.setData(null);
