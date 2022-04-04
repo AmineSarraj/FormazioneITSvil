@@ -109,22 +109,31 @@ public class AutoreServiceImpl implements AutoreService {
 	@Override
 	public AutoreDTO getByNomeAutore(String name) {
 		// TODO Auto-generated method stub
+		List<Libro> libri=new ArrayList<>();
+		List<Long> libriIds = new ArrayList<Long>();
+		List<String> libriTitolo = new ArrayList<String>();
+
 		Optional <Autore> aCheck=autoreRepository.findByNome(name);
 		if(aCheck.isPresent()) {
 			Autore a=aCheck.get();
 			
-			List<Libro> libri = libroRepository.findByAutore(a).get();
-			List<Long> libriIds = new ArrayList<Long>();
-			List<String> libriTitolo = new ArrayList<String>();
+			Optional<List<Libro>> Checklibri = libroRepository.findByAutore(a);
+			System.out.println(Checklibri);
+			if(!Checklibri.isPresent()) { libri=null;  libriIds=null;   libriTitolo=null;   }
+			else {
+			libri = Checklibri.get();
+			
 			
 			for (Libro l: libri) {
 				libriIds.add(l.getId());
 				libriTitolo.add(l.getTitolo());
 				
-			}
+			}}
 			AutoreDTO aDTO=new AutoreDTO(a.getId(),a.getNome(),a.getCognome(),libriTitolo,libriIds);
 			return aDTO;}
+		
 		else return null;
+		
 	}
 	/* 
 	*@param prende come input il id dell'autore che vorrei eliminare ;

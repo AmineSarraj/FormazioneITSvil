@@ -4,9 +4,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+
 import javax.validation.Valid;
 import org.springframework.http.MediaType;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
@@ -51,6 +54,9 @@ public class AutoreRest {
 	@Autowired
     private AutoreService autoreService;
 	
+	Logger logger =LogManager.getLogger (AutoreRest.class);
+
+	
 	/* 
 	*@param inputAutoreDTO prende un DTO di autore come requestbody ;
 	*@return result chi un DTO di autore che lo restituisce come risultato dell'autore aggiunto
@@ -68,6 +74,7 @@ public class AutoreRest {
 			risultatoAutore.setSuccess(true);
 			risultatoAutore.setDescrizione("Impossibile di inserire un nuovo autore");
 			risultatoAutore.setCode(404);
+			logger.error("Impossibile di inserire un nuovo autore");
 		return CompletableFuture.completedFuture( new ResponseEntity<RisultatoDTO<AutoreDTO>>(
 				risultatoAutore, 
 		          HttpStatus.BAD_REQUEST));}
@@ -93,6 +100,7 @@ public class AutoreRest {
 		risultatoAutore.setData(result);
 		risultatoAutore.setSuccess(true);
 		risultatoAutore.setDescrizione("autore aggiunto con successo");
+		logger.info("autore aggiunto con successo");
 		risultatoAutore.setCode(200);
 		
 		return CompletableFuture.completedFuture(new ResponseEntity<RisultatoDTO<AutoreDTO>>(
@@ -104,6 +112,7 @@ public class AutoreRest {
 		System.out.println("we are in the fallback");
 		RisultatoDTO<AutoreDTO> message=new RisultatoDTO<>();
 		message.setDescrizione("we could not fulfill the insert request");
+		logger.info("autore aggiunto con successo");
 		
 		
 			return CompletableFuture.completedFuture( new ResponseEntity<RisultatoDTO<AutoreDTO>>(
@@ -124,16 +133,19 @@ public class AutoreRest {
 	@Bulkhead(name="updateAutore", fallbackMethod = "fallbackUpdateAutore",type = Bulkhead.Type.SEMAPHORE)
 	@PostMapping(value ="/1.0/updateAutore", produces =MediaType.APPLICATION_JSON_VALUE)
     public  CompletableFuture<ResponseEntity<RisultatoDTO<AutoreDTO>>> updateAutore(@RequestBody UpdateAuthorDTOInput inputAutoreDTO) {
-		if (inputAutoreDTO.getCognome()==null || StringUtils.isBlank( inputAutoreDTO.getCognome()) ) {
-			RisultatoDTO<AutoreDTO>  risultatoAutore=new RisultatoDTO<>();
-			risultatoAutore.setData(null);
-			risultatoAutore.setSuccess(true);
-			risultatoAutore.setDescrizione("cognome non deve essere null");
-			risultatoAutore.setCode(200);
+		RisultatoDTO<AutoreDTO>  risultatoAutore=new RisultatoDTO<>();
+		risultatoAutore.setData(null);
+		risultatoAutore.setSuccess(false);
+		if (inputAutoreDTO.getNome()==null || StringUtils.isBlank( inputAutoreDTO.getNome())||inputAutoreDTO.getCognome()==null || StringUtils.isBlank( inputAutoreDTO.getCognome())||inputAutoreDTO.getId()==null)  {
+			
+			risultatoAutore.setDescrizione("Bad Request, la update non puo essere fatta");
+			logger.info("Bad Request, la update non puo essere fatta");
+
+			risultatoAutore.setCode(404);
 		return CompletableFuture.completedFuture(new ResponseEntity<RisultatoDTO<AutoreDTO>>(
 				risultatoAutore, 
-		          HttpStatus.OK));}
-		else if (inputAutoreDTO.getNome()==null || StringUtils.isBlank( inputAutoreDTO.getNome())) 
+		          HttpStatus.BAD_REQUEST));}
+		/*else if (inputAutoreDTO.getNome()==null || StringUtils.isBlank( inputAutoreDTO.getNome())||inputAutoreDTO.getCognome()==null || StringUtils.isBlank( inputAutoreDTO.getCognome())) 
 			{
 				RisultatoDTO<AutoreDTO>  risultatoAutore=new RisultatoDTO<>();
 				risultatoAutore.setData(null);
@@ -152,28 +164,28 @@ public class AutoreRest {
 			risultatoAutore.setCode(200);
 		return CompletableFuture.completedFuture(new ResponseEntity<RisultatoDTO<AutoreDTO>>(
 				risultatoAutore, 
-		          HttpStatus.OK));}
+		          HttpStatus.OK));}*/
 		AutoreDTO testAutore =autoreService.getByIdAutore(inputAutoreDTO.getId())  ;
 		 if (testAutore==null ) 
 		{
-			RisultatoDTO<AutoreDTO>  risultatoAutore=new RisultatoDTO<>();
-			risultatoAutore.setData(null);
-			risultatoAutore.setSuccess(true);
+			
 			risultatoAutore.setDescrizione("nessun id corrisponde a quello cercato");
-			risultatoAutore.setCode(200);
+			logger.info("nessun id corrisponde a quello cercato");
+			risultatoAutore.setCode(404);
 		return CompletableFuture.completedFuture(new ResponseEntity<RisultatoDTO<AutoreDTO>>(
 				risultatoAutore, 
-		          HttpStatus.OK));}
+		          HttpStatus.BAD_REQUEST));} 
 		
 		
 		else {
 		AutoreDTO result=autoreService.updateAutore(inputAutoreDTO.getNome(), inputAutoreDTO.getCognome(), inputAutoreDTO.getId());
         System.out.println("Response gotten");
-        RisultatoDTO<AutoreDTO>  risultatoAutore=new RisultatoDTO<>();
+        
 		risultatoAutore.setData(result);
 		risultatoAutore.setSuccess(true);
 		risultatoAutore.setDescrizione("l'autore che ha un id "+ inputAutoreDTO.getId()+ " è stato modificato");
 		risultatoAutore.setCode(200);
+		logger.info("Autore è stato modificato");
 	return CompletableFuture.completedFuture(new ResponseEntity<RisultatoDTO<AutoreDTO>>(
 			risultatoAutore, 
 	          HttpStatus.OK));}
@@ -181,6 +193,7 @@ public class AutoreRest {
 		}
 	public  CompletableFuture<ResponseEntity<RisultatoDTO<AutoreDTO>>> fallbackUpdateAutore(@RequestBody UpdateAuthorDTOInput inputAutoreDTO,Throwable throwable) {
 		System.out.println("we are in the fallback");
+		logger.info("Fallback, problema nel servizio");
 		
 		RisultatoDTO<AutoreDTO> message=new RisultatoDTO<>();
 		message.setDescrizione("we could not fulfill the update request");
@@ -205,26 +218,29 @@ public class AutoreRest {
     public  CompletableFuture<ResponseEntity<RisultatoDTO<AutoreDTO>>> getByIdAutore(@PathVariable Long idAutore) {
 		
 		
+		RisultatoDTO<AutoreDTO> risultatoAutore=new RisultatoDTO<>();
 		
 		AutoreDTO result =autoreService.getByIdAutore(idAutore)  ;
+		risultatoAutore.setData(result);
+		risultatoAutore.setSuccess(true);
 		if(result==null) {
-			RisultatoDTO<AutoreDTO> risultatoAutore=new RisultatoDTO<>();
-			risultatoAutore.setData(result);
-			risultatoAutore.setSuccess(true);
+			
+			
 			risultatoAutore.setDescrizione("Autore non trovato");
-			risultatoAutore.setCode(200);
+			logger.info("Autore non trovato");
+			risultatoAutore.setCode(404);
 			return CompletableFuture.completedFuture(new ResponseEntity<RisultatoDTO<AutoreDTO>>(
 					risultatoAutore, 
-			          HttpStatus.OK));
+			          HttpStatus.BAD_REQUEST));
 			
 		}
 		
 		else {
         System.out.println("Response gotten");
-        RisultatoDTO<AutoreDTO> risultatoAutore=new RisultatoDTO<>();
-		risultatoAutore.setData(result);
-		risultatoAutore.setSuccess(true);
+        
+		
 		risultatoAutore.setDescrizione("Autore trovato nella database");
+		logger.info("Autore trovato nella database");
 		risultatoAutore.setCode(200);
 
         return CompletableFuture.completedFuture(new ResponseEntity<>(
@@ -234,6 +250,8 @@ public class AutoreRest {
 	
 	public  CompletableFuture<ResponseEntity<RisultatoDTO<AutoreDTO>>> fallbackGetAutoreById(@PathVariable Long idAutore,Throwable throwable) {
 		System.out.println("Response gotten");
+		logger.info("Fallback, problema nel servizio");
+
 		
 		RisultatoDTO<AutoreDTO> message=new RisultatoDTO<>();
 		message.setDescrizione("we could not fulfill the request find by id");
@@ -259,12 +277,15 @@ public class AutoreRest {
 		
 		
 		AutoreDTO result =autoreService.getByNomeAutore(nameAutore)  ;
+		RisultatoDTO<AutoreDTO> risultatoAutore=new RisultatoDTO<>();
+		risultatoAutore.setData(result);
+		risultatoAutore.setSuccess(true);
         System.out.println("Response gotten");
         if(result==null) {
-        	RisultatoDTO<AutoreDTO> risultatoAutore=new RisultatoDTO<>();
-			risultatoAutore.setData(result);
-			risultatoAutore.setSuccess(true);
+        	
 			risultatoAutore.setDescrizione("Autore non trovato");
+			logger.info("Autore non trovato");
+
 			risultatoAutore.setCode(404);
 			
 			return CompletableFuture.completedFuture(new ResponseEntity<RisultatoDTO<AutoreDTO>>(
@@ -276,9 +297,7 @@ public class AutoreRest {
 		
         else {
             System.out.println("Response gotten");
-            RisultatoDTO<AutoreDTO> risultatoAutore=new RisultatoDTO<>();
-    		risultatoAutore.setData(result);
-    		risultatoAutore.setSuccess(true);
+            
     		risultatoAutore.setDescrizione("Autore trovato nella database");
     		risultatoAutore.setCode(200);
     		ResponseEntity<RisultatoDTO<AutoreDTO>> response=new ResponseEntity<RisultatoDTO<AutoreDTO>>(
@@ -295,6 +314,8 @@ public class AutoreRest {
 	public  CompletableFuture<ResponseEntity<RisultatoDTO<AutoreDTO>>> fallbackGetAutoreByName(@PathVariable String name,Throwable throwable) {
 		System.out.println("Response gotten");
 		RisultatoDTO<AutoreDTO> message=new RisultatoDTO<>();
+		logger.info("Fallback, problema nel servizio");
+		throwable.printStackTrace();
 		message.setDescrizione("we could not fulfill the request");
 		
 		
@@ -318,6 +339,7 @@ public class AutoreRest {
 		System.out.println("Response gotten");
 		message.setDescrizione("the delete request succeded");
 		autoreService.deleteByIdAutore(idAutore) ;
+		logger.info("Autore deleted");
         System.out.println("Response gotten");
         return CompletableFuture.completedFuture( new ResponseEntity<RisultatoDTO<AutoreDTO>>(
 				message, 
@@ -327,6 +349,7 @@ public class AutoreRest {
 		System.out.println("Response gotten from fallback");
 		RisultatoDTO<AutoreDTO> message=new RisultatoDTO<>();
 		message.setDescrizione("we could not fulfill the delete request");
+		logger.info("Fallback, problema nel servizio ");
 		
 		
 			return CompletableFuture.completedFuture( new ResponseEntity<RisultatoDTO<AutoreDTO>>(
@@ -346,11 +369,13 @@ public class AutoreRest {
 		
 		
 		AutoreDTO result =autoreService.getByIdAutore(id)  ;
+		RisultatoDTO<AutoreDTO> risultatoAutore=new RisultatoDTO<>();
+		risultatoAutore.setData(result);
+		risultatoAutore.setSuccess(true);
 		if(result==null) {
-        	RisultatoDTO<AutoreDTO> risultatoAutore=new RisultatoDTO<>();
-			risultatoAutore.setData(null);
-			risultatoAutore.setSuccess(true);
 			risultatoAutore.setDescrizione("Autore non trovato");
+			logger.info("Autore non trovato.");
+
 			risultatoAutore.setCode(404);
 			return CompletableFuture.completedFuture( new ResponseEntity<RisultatoDTO<AutoreDTO>>(
 					risultatoAutore, 
@@ -361,10 +386,8 @@ public class AutoreRest {
 		
         else {
             System.out.println("Response gotten");
-            RisultatoDTO<AutoreDTO> risultatoAutore=new RisultatoDTO<>();
-    		risultatoAutore.setData(result);
-    		risultatoAutore.setSuccess(true);
     		risultatoAutore.setDescrizione("Autore trovato nella database");
+    		logger.info("Autore trovato nella database.");
     		risultatoAutore.setCode(200);
 
             return CompletableFuture.completedFuture(new ResponseEntity<>(
@@ -373,7 +396,7 @@ public class AutoreRest {
     }
 	public  CompletableFuture<ResponseEntity<RisultatoDTO<AutoreDTO>>> fallbackGetAutoreByLibro(@PathVariable Long id,Throwable throwable) {
 		System.out.println("Response gotten from fallback");
-		
+		logger.info("FallBack, problema al servizio.");
 		RisultatoDTO<AutoreDTO> message=new RisultatoDTO<>();
 		message.setDescrizione("we could not fulfill the get libri by id request");
 		

@@ -3,6 +3,8 @@ package com.example.Libreria.rest;
 import java.util.concurrent.CompletableFuture;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -40,6 +42,8 @@ import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 public class CasaEditriceRest {
 	@Autowired
     private CasaEditriceService casaEditriceService;
+	
+	Logger logger =LogManager.getLogger (CasaEditriceRest.class);
 	/* 
 	*@param casa_EditriceDTO prende un DTO di una Casa_Editrice come requestbody ;
 	*@return result chi un DTO di Casa_Editrice che lo restituisce come risultato della Casa_Editrice aggiunto
@@ -53,12 +57,14 @@ public class CasaEditriceRest {
 		
 		CasaEditriceDTO casa_editriceDTO;
 		
-		
+		RisultatoDTO<CasaEditriceDTO>  risultatoCasaEditrice=new RisultatoDTO<>();
+		risultatoCasaEditrice.setData(null);
+		risultatoCasaEditrice.setSuccess(true);
 		if (casa_EditriceDTO.getNome()==null || StringUtils.isBlank(casa_EditriceDTO.getNome())) {
-			RisultatoDTO<CasaEditriceDTO>  risultatoCasaEditrice=new RisultatoDTO<>();
-			risultatoCasaEditrice.setData(null);
-			risultatoCasaEditrice.setSuccess(true);
+			
 			risultatoCasaEditrice.setDescrizione("nome non deve essere null o empty");
+			logger.error("Impossibile di inserire un nuova casa editrice");
+			
 			risultatoCasaEditrice.setCode(200);
 		return CompletableFuture.completedFuture(new ResponseEntity<RisultatoDTO<CasaEditriceDTO>>(
 				risultatoCasaEditrice, 
@@ -68,12 +74,14 @@ public class CasaEditriceRest {
 		else {
 		
 		
-		RisultatoDTO<CasaEditriceDTO>  risultatoCasaEditrice=new RisultatoDTO<>();
+		
 		casa_editriceDTO= casaEditriceService.saveCasa_Editrice(casa_EditriceDTO.getNome(),casa_EditriceDTO.getLibri());
 		
 		risultatoCasaEditrice.setData(casa_editriceDTO);
 		risultatoCasaEditrice.setSuccess(true);
 		risultatoCasaEditrice.setDescrizione("casa editrice aggiunta con successo");
+		logger.error("casa editrice aggiunta con successo");
+
 		risultatoCasaEditrice.setCode(200);
 		
 		return CompletableFuture.completedFuture(new ResponseEntity<RisultatoDTO<CasaEditriceDTO>>(
@@ -111,11 +119,13 @@ public class CasaEditriceRest {
 		
 		
         CasaEditriceDTO result = casaEditriceService.getByIdCasa_Editrice(idCasaEditrice) ;
+        RisultatoDTO<CasaEditriceDTO> risultatoCasaEditrice=new RisultatoDTO<>();
+		risultatoCasaEditrice.setData(result);
+		risultatoCasaEditrice.setSuccess(true);
         if(result==null) {
-			RisultatoDTO<CasaEditriceDTO> risultatoCasaEditrice=new RisultatoDTO<>();
-			risultatoCasaEditrice.setData(result);
-			risultatoCasaEditrice.setSuccess(true);
+			
 			risultatoCasaEditrice.setDescrizione("casa editrice non trovato");
+			logger.error("casa editrice non trovata");
 			risultatoCasaEditrice.setCode(200);
 			return CompletableFuture.completedFuture(new ResponseEntity<RisultatoDTO<CasaEditriceDTO>>(
 					risultatoCasaEditrice, 
@@ -125,10 +135,9 @@ public class CasaEditriceRest {
 		
 		else {
         System.out.println("Response gotten");
-        RisultatoDTO<CasaEditriceDTO> risultatoCasaEditrice=new RisultatoDTO<>();
-        risultatoCasaEditrice.setData(result);
-        risultatoCasaEditrice.setSuccess(true);
+        
 		risultatoCasaEditrice.setDescrizione("casa editrice trovata nella database");
+		logger.error("casa editrice trovata nella database");
 		risultatoCasaEditrice.setCode(200);
 
         return CompletableFuture.completedFuture(new ResponseEntity<>(
@@ -142,7 +151,7 @@ public class CasaEditriceRest {
 		
 		RisultatoDTO<CasaEditriceDTO> message=new RisultatoDTO<>();
 		message.setDescrizione("we could not fulfill the get by id request");
-		
+		logger.error("we could not fulfill the get by id request");
 		
 			return CompletableFuture.completedFuture( new ResponseEntity<RisultatoDTO<CasaEditriceDTO>>(
 					message, 
@@ -165,11 +174,13 @@ public class CasaEditriceRest {
 		
 		
         CasaEditriceDTO result = casaEditriceService.getByNomeCasa_Editrice(nameCasaEditrice) ;
+        RisultatoDTO<CasaEditriceDTO> risultatoCasaEditrice=new RisultatoDTO<>();
+		risultatoCasaEditrice.setData(result);
+		risultatoCasaEditrice.setSuccess(true);
         if(result==null) {
-			RisultatoDTO<CasaEditriceDTO> risultatoCasaEditrice=new RisultatoDTO<>();
-			risultatoCasaEditrice.setData(result);
-			risultatoCasaEditrice.setSuccess(true);
+		
 			risultatoCasaEditrice.setDescrizione("nessuna casa editrice ha questo errore");
+			logger.error("nessuna casa editrice ha questo errore");
 			risultatoCasaEditrice.setCode(200);
 			return CompletableFuture.completedFuture(new ResponseEntity<RisultatoDTO<CasaEditriceDTO>>(
 					risultatoCasaEditrice, 
@@ -179,10 +190,8 @@ public class CasaEditriceRest {
 		
 		else {
         System.out.println("Response gotten");
-        RisultatoDTO<CasaEditriceDTO> risultatoCasaEditrice=new RisultatoDTO<>();
-        risultatoCasaEditrice.setData(result);
-        risultatoCasaEditrice.setSuccess(true);
 		risultatoCasaEditrice.setDescrizione("casa editrice trovata nella database");
+		logger.error("casa editrice trovata nella database");
 		risultatoCasaEditrice.setCode(200);
 
         return CompletableFuture.completedFuture(new ResponseEntity<>(
@@ -193,9 +202,10 @@ public class CasaEditriceRest {
     }
 	public  CompletableFuture<ResponseEntity<RisultatoDTO<CasaEditriceDTO>>> fallbackGetCasaEditriceByName(@PathVariable String name,Throwable throwable) {
 		System.out.println("we are in the fallback");
-		
+		logger.error("Fallback, problema al sistema");
 		RisultatoDTO<CasaEditriceDTO> message=new RisultatoDTO<>();
 		message.setDescrizione("we could not fulfill the get by name request");
+		
 		
 		
 			return CompletableFuture.completedFuture( new ResponseEntity<RisultatoDTO<CasaEditriceDTO>>(
@@ -218,46 +228,30 @@ public class CasaEditriceRest {
 		
 		
 		
-        
-        
-		 if (casa_EditriceDTO.getNome()==null || StringUtils.isBlank(casa_EditriceDTO.getNome())) 
+		CasaEditriceDTO testCasaEditrice = casaEditriceService.getByIdCasa_Editrice(casa_EditriceDTO.getId()) ;
+		RisultatoDTO<CasaEditriceDTO> risultatoCasaEditrice=new RisultatoDTO<>();
+		risultatoCasaEditrice.setData(null);
+		risultatoCasaEditrice.setSuccess(false);
+		 if (casa_EditriceDTO.getNome()==null || StringUtils.isBlank(casa_EditriceDTO.getNome())||casa_EditriceDTO.getId()==null||testCasaEditrice==null) 
 			{
-			 RisultatoDTO<CasaEditriceDTO> risultatoCasaEditrice=new RisultatoDTO<>();
-				risultatoCasaEditrice.setData(null);
-				risultatoCasaEditrice.setSuccess(true);
-				risultatoCasaEditrice.setDescrizione("nome non deve essere null o empty");
-				risultatoCasaEditrice.setCode(200);
+			 
+				risultatoCasaEditrice.setDescrizione("Bad Request");
+				logger.error("Bad Request");
+				risultatoCasaEditrice.setCode(404);
 				return CompletableFuture.completedFuture(new ResponseEntity<RisultatoDTO<CasaEditriceDTO>>(
 						risultatoCasaEditrice, 
-				          HttpStatus.OK));}
-		else if (casa_EditriceDTO.getId()==null ) 
-		{
-			RisultatoDTO<CasaEditriceDTO> risultatoCasaEditrice=new RisultatoDTO<>();
-			risultatoCasaEditrice.setData(null);
-			risultatoCasaEditrice.setSuccess(true);
-			risultatoCasaEditrice.setDescrizione("casa editrice non trovato");
-			risultatoCasaEditrice.setCode(200);
-			return CompletableFuture.completedFuture(new ResponseEntity<RisultatoDTO<CasaEditriceDTO>>(
-					risultatoCasaEditrice, 
-			          HttpStatus.OK));}
-		 CasaEditriceDTO testCasaEditrice = casaEditriceService.getByIdCasa_Editrice(casa_EditriceDTO.getId()) ;
-		 if (testCasaEditrice==null) 
-			{
-				RisultatoDTO<CasaEditriceDTO> risultatoCasaEditrice=new RisultatoDTO<>();
-				risultatoCasaEditrice.setData(null);
-				risultatoCasaEditrice.setSuccess(true);
-				risultatoCasaEditrice.setDescrizione("nessun id corrisponde a quel data editrice");
-				risultatoCasaEditrice.setCode(200);
-				return CompletableFuture.completedFuture(new ResponseEntity<RisultatoDTO<CasaEditriceDTO>>(
-						risultatoCasaEditrice, 
-				          HttpStatus.OK));}
+				          HttpStatus.BAD_REQUEST));}
+		
+		 
+		 
 		
 		else {
 		CasaEditriceDTO result = casaEditriceService.updateCasa_Editrice(casa_EditriceDTO.getId(),casa_EditriceDTO.getNome()) ;
-		RisultatoDTO<CasaEditriceDTO> risultatoCasaEditrice=new RisultatoDTO<>();
+		
         risultatoCasaEditrice.setData(result);
         risultatoCasaEditrice.setSuccess(true);
 		risultatoCasaEditrice.setDescrizione("casa editrice updated");
+		logger.error("casa editrice updated");
 		risultatoCasaEditrice.setCode(200);
 
         return CompletableFuture.completedFuture(new ResponseEntity<>(
@@ -266,8 +260,8 @@ public class CasaEditriceRest {
         
     }
 	public  CompletableFuture<ResponseEntity<RisultatoDTO<CasaEditriceDTO>>> fallbackUpdateCasaEditrice(@RequestBody  UpdateCasaEditriceInput casa_EditriceDTO,Throwable throwable) {
-		System.out.println("we are in the fallback");
 		
+		logger.error("Fallback, problema al sistema");
 		RisultatoDTO<CasaEditriceDTO> message=new RisultatoDTO<>();
 		message.setDescrizione("we could not fulfill the update request");
 		
@@ -295,6 +289,7 @@ public class CasaEditriceRest {
         System.out.println("Response gotten");
         RisultatoDTO<CasaEditriceDTO> message=new RisultatoDTO<>();
 		message.setDescrizione("the delete request succeded");
+		logger.error("the delete request succeded");
 		return CompletableFuture.completedFuture( new ResponseEntity<RisultatoDTO<CasaEditriceDTO>>(
 				message, 
 		          HttpStatus.OK));
@@ -304,6 +299,7 @@ public class CasaEditriceRest {
 	
 	public  CompletableFuture<ResponseEntity<RisultatoDTO<CasaEditriceDTO>>> fallbackDeleteCasaEditrice(@PathVariable Long id,Throwable throwable) {
 		System.out.println("we are in the fallback");
+		logger.error("Fallback, problema al sistema");
 		
 		RisultatoDTO<CasaEditriceDTO> message=new RisultatoDTO<>();
 		message.setDescrizione("we could not fulfill the delete request");

@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.sql.Date;
 import org.apache.commons.lang3.StringUtils;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -57,6 +58,7 @@ public class LibroRest {
 	@Autowired
     private AutoreService autoreService;
 	
+	Logger logger =LogManager.getLogger (LibroRest.class);
 	/* 
 	*@param libroDTO prende un DTO di un libro come requestbody ;
 	*@return result chi un DTO di libro che lo restituisce come risultato del libro che si è fatto la get a partire del titolo.
@@ -74,6 +76,7 @@ public class LibroRest {
  			risultatoLibro.setData(result);
  			risultatoLibro.setSuccess(true);
  			risultatoLibro.setDescrizione("libro non trovato");
+ 			logger.error("libro non trovato");
  			risultatoLibro.setCode(200);
  			return CompletableFuture.completedFuture(new ResponseEntity<RisultatoDTO<LibroDTO>>(
  					risultatoLibro, 
@@ -85,6 +88,7 @@ public class LibroRest {
   			risultatoLibro.setData(result);
   			risultatoLibro.setSuccess(true);
   			risultatoLibro.setDescrizione("libro trovato");
+  			logger.error("libro trovato");
   			risultatoLibro.setCode(200);
   			return CompletableFuture.completedFuture(new ResponseEntity<RisultatoDTO<LibroDTO>>(
   					risultatoLibro, 
@@ -97,7 +101,7 @@ public class LibroRest {
 		
 		RisultatoDTO<LibroDTO> message=new RisultatoDTO<>();
 		message.setDescrizione("we could not fulfill the get by name request");
-		
+		logger.error("Fallback");
 		
 			return CompletableFuture.completedFuture( new ResponseEntity<RisultatoDTO<LibroDTO>>(
 					message, 
@@ -132,6 +136,7 @@ public class LibroRest {
  		risultatoLibro.setData(null);
  		risultatoLibro.setSuccess(true);
  		risultatoLibro.setDescrizione(NullorEmptyOutputAttributs.toString());
+ 		logger.error(NullorEmptyOutputAttributs.toString());
  		risultatoLibro.setCode(200);
  		return CompletableFuture.completedFuture(new ResponseEntity<RisultatoDTO<LibroDTO>>(
  					risultatoLibro, 
@@ -168,6 +173,8 @@ public class LibroRest {
   			risultatoLibro.setData(result);
   			risultatoLibro.setSuccess(true);
   			risultatoLibro.setDescrizione("libro aggiunto ");
+  			logger.error("libro aggiunto");
+
   			risultatoLibro.setCode(200);
   			return CompletableFuture.completedFuture(new ResponseEntity<RisultatoDTO<LibroDTO>>(
   					risultatoLibro, 
@@ -183,7 +190,7 @@ public class LibroRest {
 	
 	public  CompletableFuture<ResponseEntity<RisultatoDTO<LibroDTO>>> fallbackInsertLibro(  @RequestBody LibroDTO libroDTO,Throwable throwable) {
 		System.out.println("we are in the fallback");
-		
+		logger.error("Fallback");
 		RisultatoDTO<LibroDTO> message=new RisultatoDTO<>();
 		message.setDescrizione("we could not fulfill the insert request");
 		
@@ -213,6 +220,8 @@ public class LibroRest {
  			risultatoLibro.setData(result);
  			risultatoLibro.setSuccess(true);
  			risultatoLibro.setDescrizione("libro non trovato");
+ 			logger.error("libro non trovato");
+
  			risultatoLibro.setCode(200);
  			return CompletableFuture.completedFuture(new ResponseEntity<RisultatoDTO<LibroDTO>>(
  					risultatoLibro, 
@@ -224,6 +233,7 @@ public class LibroRest {
   			risultatoLibro.setData(result);
   			risultatoLibro.setSuccess(true);
   			risultatoLibro.setDescrizione("libro trovato");
+  			logger.error("libro trovato");
   			risultatoLibro.setCode(200);
   			return CompletableFuture.completedFuture(new ResponseEntity<RisultatoDTO<LibroDTO>>(
   					risultatoLibro, 
@@ -235,7 +245,8 @@ public class LibroRest {
     }
 	public  CompletableFuture<ResponseEntity<RisultatoDTO<LibroDTO>>> fallbackGetLibroById(  @PathVariable Long id,Throwable throwable) {
 		System.out.println("we are in the fallback");
-		
+		logger.error("Fallback");
+
 		RisultatoDTO<LibroDTO> message=new RisultatoDTO<>();
 		message.setDescrizione("we could not fulfill the insert request");
 		
@@ -262,6 +273,7 @@ public class LibroRest {
         System.out.println("Response gotten");
         RisultatoDTO<LibroDTO> message=new RisultatoDTO<>();
 		message.setDescrizione("Delete succeded");
+		logger.error("Delete succeded");
 		
 		
 			return CompletableFuture.completedFuture( new ResponseEntity<RisultatoDTO<LibroDTO>>(
@@ -272,7 +284,7 @@ public class LibroRest {
     }
 	public  CompletableFuture<ResponseEntity<RisultatoDTO<LibroDTO>>> fallbackDeleteLibro(@PathVariable Long id,Throwable throwable) {
 		System.out.println("we are in the fallback");
-		
+		logger.error("Fallback");
 		RisultatoDTO<LibroDTO> message=new RisultatoDTO<>();
 		message.setDescrizione("we could not fulfill the delete request");
 	
@@ -299,12 +311,14 @@ public class LibroRest {
 		
 		
         List <LibroDTO> result = libroService.getByDateGreaterThan(condition) ;
+        RisultatoDTO<LibroDTO> risultatoLibro=new RisultatoDTO<>();
+			risultatoLibro.setDati(result);
+			risultatoLibro.setSuccess(true);
         System.out.println("Response gotten");
         if(result==null) {
- 			RisultatoDTO<LibroDTO> risultatoLibro=new RisultatoDTO<>();
- 			risultatoLibro.setDati(result);
- 			risultatoLibro.setSuccess(true);
+ 			
  			risultatoLibro.setDescrizione("libro non trovato");
+ 			logger.error("libro non trovato");
  			risultatoLibro.setCode(200);
  			return CompletableFuture.completedFuture(new ResponseEntity<RisultatoDTO<LibroDTO>>(
  					risultatoLibro, 
@@ -312,10 +326,8 @@ public class LibroRest {
  			
  		}
          else {
-        	 RisultatoDTO<LibroDTO> risultatoLibro=new RisultatoDTO<>();
-  			risultatoLibro.setDati(result);
-  			risultatoLibro.setSuccess(true);
   			risultatoLibro.setDescrizione("libri trovati");
+  			logger.error("libro trovati");
   			risultatoLibro.setCode(200);
   			return CompletableFuture.completedFuture(new ResponseEntity<RisultatoDTO<LibroDTO>>(
   					risultatoLibro, 
@@ -324,13 +336,10 @@ public class LibroRest {
         
     }
 	public  CompletableFuture<ResponseEntity<RisultatoDTO<LibroDTO>>> fallbackGetByDateLibro(@PathVariable Date condition,Throwable throwable) {
-		System.out.println("we are in the fallback");
-		CompletableFuture<ResponseEntity<RisultatoDTO<AutoreDTO>>> future=new CompletableFuture<>();
+		logger.error("Fallback");
 		RisultatoDTO<LibroDTO> message=new RisultatoDTO<>();
 		message.setDescrizione("we could not fulfill the insert request");
-		ResponseEntity<RisultatoDTO<LibroDTO>> response=new ResponseEntity<RisultatoDTO<LibroDTO>>(
-				message, 
-		          HttpStatus.OK);
+		
 		
 			return CompletableFuture.completedFuture( new ResponseEntity<RisultatoDTO<LibroDTO>>(
 					message, 
@@ -359,6 +368,7 @@ public class LibroRest {
  			risultatoLibro.setDati(result);
  			risultatoLibro.setSuccess(true);
  			risultatoLibro.setDescrizione("libro non trovato");
+ 			logger.error("libro non trovato");
  			risultatoLibro.setCode(200);
  			return CompletableFuture.completedFuture(new ResponseEntity<RisultatoDTO<LibroDTO>>(
  					risultatoLibro, 
@@ -370,6 +380,7 @@ public class LibroRest {
   			risultatoLibro.setDati(result);
   			risultatoLibro.setSuccess(true);
   			risultatoLibro.setDescrizione("libri trovati");
+  			logger.error("libri  trovati");
   			risultatoLibro.setCode(200);
   			return CompletableFuture.completedFuture(new ResponseEntity<RisultatoDTO<LibroDTO>>(
   					risultatoLibro, 
@@ -379,7 +390,7 @@ public class LibroRest {
     }
 	public  CompletableFuture<ResponseEntity<RisultatoDTO<LibroDTO>>> fallbackGetByContainingLibro(@PathVariable String condition,Throwable throwable) {
 		System.out.println("we are in the fallback");
-		
+		logger.error("Fallback");
 		RisultatoDTO<LibroDTO> message=new RisultatoDTO<>();
 		message.setDescrizione("we could not fulfill the insert request");
 		
